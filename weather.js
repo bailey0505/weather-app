@@ -12,6 +12,8 @@ var path = require('path');
 
 
 var modules = require('./lib/modules.js');
+var get_weather = require('./framework/get_weather.js');
+
 
 var app = express();
 
@@ -50,6 +52,19 @@ app.get('/support', function(req, res) {
     });
 });
 
+app.get('/nytimes', function(req, res) {
+    res.render('nytimes', {
+    });
+});
+
+app.post('/getweather', (req, res) => {
+    var address = req.body.city;
+    var out = get_weather.get_loc(address);
+    //console.log(out);
+    //var weather = get_weather.get_weather(out);
+   // console.log(weather);
+});
+
 
 app.use(function(req, res, next){
     res.status(404);
@@ -62,8 +77,6 @@ app.use(function(err, req, res, next){
 });
 
 app.listen(app.get('port'), function(){
- console.log( 'Express started on http://localhost:' +
- app.get('port') + '; press Ctrl-C to terminate.' );
-    
+ console.log('Weather App is Running on Port 3001')   
 });
 
