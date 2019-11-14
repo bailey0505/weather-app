@@ -13,6 +13,7 @@ var path = require('path');
 
 var modules = require('./lib/modules.js');
 var get_weather = require('./framework/get_weather.js');
+var articles = require('./framework/ny_times.js');
 
 
 var app = express();
@@ -48,21 +49,37 @@ app.get('/about', function(req, res) {
     });
 });
 app.get('/support', function(req, res) {
-    res.render('home', {
+    res.render('support', {
     });
 });
 
 app.get('/nytimes', function(req, res) {
-    res.render('nytimes', {
+    articles.GetArticles(function(data){
+        res.render('nytimes', {
+            title1 : data[0],
+            title2 : data[1],
+            title3 : data[2],
+    });
+        
     });
 });
 
-app.post('/getweather', (req, res) => {
+app.post('/getweather', function(req, res) {
     var address = req.body.city;
-    var out = get_weather.get_loc(address);
-    //console.log(out);
-    //var weather = get_weather.get_weather(out);
-   // console.log(weather);
+    get_weather.get_loc(address, function(err, data){
+        //console.log(err);
+        if(err === "error"){
+           //console.log("Error");
+            res.redirect('505');
+        }else{ 
+            //console.log("Hello");
+            res.render('home', {
+                summary : data[0],
+                temp : data[1],
+                chance : data[2]
+            });
+        }
+     })
 });
 
 
@@ -73,7 +90,7 @@ app.use(function(req, res, next){
 app.use(function(err, req, res, next){
    console.log(err.stack);
     res.status(500);
-    res.render('500');
+    res.render('505');
 });
 
 app.listen(app.get('port'), function(){
